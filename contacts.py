@@ -13,8 +13,6 @@ parser.add_argument('traj', type=str, help='trajectory file')
 parser.add_argument('first', type=int, help='First frame starts at 0')
 parser.add_argument('last', type=int, help='Last frame inclusive')
 parser.add_argument('cutoff', type=float, help='cutoff to define the contacts')
-parser.add_argument('start_sele1', type=int, help='Value to shift residues of first selection to match gro')
-parser.add_argument('start_sele2', type=int, help='Value to shift residues of second selection to match gro')
 parser.add_argument('out', type=str, help='output file')
 args = parser.parse_args()
 
