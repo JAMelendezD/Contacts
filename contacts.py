@@ -13,6 +13,8 @@ parser.add_argument('traj', type=str, help='trajectory file')
 parser.add_argument('first', type=int, help='First frame starts at 0')
 parser.add_argument('last', type=int, help='Last frame inclusive')
 parser.add_argument('cutoff', type=float, help='cutoff to define the contacts')
+parser.add_argument('start_sele1', type=int, help='Value to shift residues of first selection to match gro')
+parser.add_argument('start_sele2', type=int, help='Value to shift residues of second selection to match gro')
 parser.add_argument('out', type=str, help='output file')
 args = parser.parse_args()
 
@@ -23,7 +25,7 @@ def res_and_names(selection,num_atoms):
 	sel_resids = np.zeros(num_atoms,dtype=int)
 	sel_names = []
 	for i in range(num_atoms):
-		sel_resids[i] = selection.atoms[i].resindex
+		sel_resids[i] = selection.atoms[i].resindex+1
 		sel_names.append(selection.atoms[i].resname)
 	return(sel_resids,sel_names)
 
@@ -89,15 +91,15 @@ def run():
 	print(f'The number of atoms in selection 1:\t\t{num_atoms_sel1:8d}')
 	print(f'The number of atoms in selection 2:\t\t{num_atoms_sel2:8d}')
 
-	sel1_resnums = list(sel1.atoms.resnums)
-	sel2_resnums = list(sel2.atoms.resnums)
+	sel1_resids,sel1_names = res_and_names(sel1,num_atoms_sel1)
+	sel2_resids,sel2_names = res_and_names(sel2,num_atoms_sel2)
+	
+	sel1_resnums = sel1.resnums
+	sel2_resnums = sel2.resnums
 
 	print(f'The first and last resnums for selection 1:\t{sel1_resnums[0]:5d}{sel1_resnums[-1]:5d}')
 	print(f'The first and last resnums for selection 2:\t{sel2_resnums[0]:5d}{sel2_resnums[-1]:5d}')
 
-	sel1_resids,sel1_names = res_and_names(sel1,num_atoms_sel1)
-	sel2_resids,sel2_names = res_and_names(sel2,num_atoms_sel2)
-	
 	print(f'The first and last resids for selection 1:\t{sel1_resids[0]:5d}{sel1_resids[-1]:5d}')
 	print(f'The first and last resids for selection 2:\t{sel2_resids[0]:5d}{sel2_resids[-1]:5d}')
 
