@@ -27,7 +27,7 @@ def res_and_names(selection,num_atoms):
 		sel_names.append(selection.atoms[i].resname)
 	return(sel_resids,sel_names)
 
-def log(output,indeces,frame):
+def log(resnames1,resnames2,resids1,resids2,names1,names2,atoms1,atoms2,output,indeces,frame):
 	'''
 	Appends to a log file evertime a contact is found
 	'''
@@ -35,15 +35,15 @@ def log(output,indeces,frame):
 		for ele in indeces:
 			i = int(ele[0])
 			j = int(ele[1])
-			res_num1 = sel1_resnums[i]
-			res_num2 = sel2_resnums[j]
-			res_id1 = sel1_resids[i]
-			res_id2 = sel2_resids[j]
-			res_name1 = sel1_names[i]
-			res_name2 = sel2_names[j]
-			atom_name1 = sel1_atoms[i]
-			atom_name2 = sel2_atoms[j]
-			f.write(f'{frame:8d}{res_name1:>5s}{res_num1:5d}{res_id1:5d}{atom_name1:>5s}{res_name2:>5s}{res_num2:5d}{res_id2:5d}{atom_name2:>5s}{ele[2]:5.2f}\n')
+			res_num1 = resnames1[i]
+			res_num2 = resnames2[j]
+			res_id1 = resids1[i]
+			res_id2 = resids2[j]
+			res_name1 = names1[i]
+			res_name2 = names2[j]
+			atom_name1 = atoms1[i]
+			atom_name2 = atoms2[j]
+			f.write(f'{frame:8d}{res_name1:>5s}{res_num1:5d}{res_id1:5d}{atom_name1:>5s}{res_name2:>5s}{res_num2:5d}{res_id2:5d}{atom_name2:>5s}{ele[2]:6.2f}\n')
 
 @jit(nopython=True)
 def distance(atom1, atom2):
@@ -69,10 +69,10 @@ def contacts(positions1,positions2,cutoff):
 				out.append([i,j,r])
 	return out
 
-if __name__ == '__main__':
+def run():
 	if exists(args.out):
 		raise FileExistsError(f'File {args.out} exists in current directory')
-	
+			
 	print(f'MDA version: {mda.__version__}')
 
 	u = mda.Universe(args.top,args.traj) # Works only with .gro files since mda renumerates the .tpr
@@ -109,4 +109,9 @@ if __name__ == '__main__':
 
 	for ts in tqdm(u.trajectory[args.first:args.last+1],colour='green',desc='Frames'):
 		temp = contacts(sel1.positions,sel2.positions,args.cutoff)
-		log(args.out,temp,int(ts.frame))
+		log(sel1_resnums,sel2_resnums,sel1_resids,sel2_resids,
+		    sel1_names,sel2_names,sel1_atoms,sel2_atoms,
+			args.out,temp,int(ts.frame))
+
+if __name__ == '__main__':
+	run()
