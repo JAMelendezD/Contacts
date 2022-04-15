@@ -46,7 +46,7 @@ def log(output,indeces,frame):
 			f.write(f'{frame:8d}{res_name1:>5s}{res_num1:5d}{res_id1:5d}{atom_name1:>5s}{res_name2:>5s}{res_num2:5d}{res_id2:5d}{atom_name2:>5s}{ele[2]:5.2f}\n')
 
 @jit(nopython=True)
-def distance_numba_scalar_prange(atom1, atom2):
+def distance(atom1, atom2):
 	'''
 	Computes the euclidian distance between 2 vectors
 	'''
@@ -64,7 +64,7 @@ def contacts(positions1,positions2,cutoff):
 	out = []
 	for i in range(len(positions1)):
 		for j in range(len(positions2)):
-			r = distance_numba_scalar_prange(positions1[i], positions2[j])
+			r = distance(positions1[i], positions2[j])
 			if r <= cutoff:
 				out.append([i,j,r])
 	return out
