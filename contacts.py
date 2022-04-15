@@ -12,7 +12,7 @@ parser.add_argument('top', type=str, help='gro or tpr file')
 parser.add_argument('traj', type=str, help='trajectory file')
 parser.add_argument('first', type=int, help='First frame starts at 0')
 parser.add_argument('last', type=int, help='Last frame inclusive')
-parser.add_argument('cutoff', type=float, help='cutoff to define the contacts')
+parser.add_argument('d_cutoff', type=float, help='distance cutoff to define the contacts')
 parser.add_argument('out', type=str, help='output file')
 args = parser.parse_args()
 
@@ -83,6 +83,10 @@ def run():
 	sel1 = u.select_atoms('bynum 1:6557 and not name H*')
 	sel2 = u.select_atoms('bynum 6558:13114 and not name H*')
 
+	# hydrophobic contacts
+	#sel1 = u.select_atoms('bynum 1:6557 and name C* and (resname ALA or resname VAL or resname PHE or resname LEU or resname ILE or resname TRP or resname PRO or resname MET)')
+	#sel2 = u.select_atoms('bynum 6558:13114 and name C* and (resname ALA or resname VAL or resname PHE or resname LEU or resname ILE or resname TRP or resname PRO or resname MET)')
+
 	num_atoms_sel1 = len(sel1)
 	num_atoms_sel2 = len(sel2)
 
@@ -105,7 +109,7 @@ def run():
 	sel2_atoms = list(sel2.atoms.names)
 
 	for ts in tqdm(u.trajectory[args.first:args.last+1],colour='green',desc='Frames'):
-		temp = contacts(sel1.positions,sel2.positions,args.cutoff)
+		temp = contacts(sel1.positions,sel2.positions,args.d_cutoff)
 		log(sel1_resnums,sel2_resnums,sel1_resids,sel2_resids,
 		    sel1_names,sel2_names,sel1_atoms,sel2_atoms,
 			args.out,temp,int(ts.frame))

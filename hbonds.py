@@ -12,7 +12,8 @@ parser.add_argument('top', type=str, help='gro or tpr file')
 parser.add_argument('traj', type=str, help='trajectory file')
 parser.add_argument('first', type=int, help='First frame starts at 0')
 parser.add_argument('last', type=int, help='Last frame inclusive')
-parser.add_argument('cutoff', type=float, help='cutoff to define the contacts')
+parser.add_argument('d_cutoff', type=float, help='D-A distance cutoff to define the contacts')
+parser.add_argument('ang_cutoff', type=float, help='H-D-A angle cutoff to define the contacts')
 parser.add_argument('out', type=str, help='output file')
 args = parser.parse_args()
 
@@ -80,7 +81,7 @@ def angle(hbonds,donors,acceptors_pos,universe):
 				dif1 = acceptor_pos-donor_pos
 				dif2 = H_pos-donor_pos
 				angle = np.rad2deg(np.arccos(np.dot(dif1,dif2)/(np.linalg.norm(dif1)*np.linalg.norm(dif2))))
-				if angle <= 30:
+				if angle <= args.ang_cutoff:
 					ele.append(angle)
 					result.append(ele)
 	return(result)
@@ -106,20 +107,20 @@ def run():
 	num_atoms_acceptor1 = len(acceptor1)
 	num_atoms_acceptor2 = len(acceptor2)
 
-	print(f'The number of atoms in selection 1:\t\t{num_atoms_donor1:8d}')
-	print(f'The number of atoms in selection 1:\t\t{num_atoms_donor2:8d}')
-	print(f'The number of atoms in selection 1:\t\t{num_atoms_acceptor1:8d}')
-	print(f'The number of atoms in selection 1:\t\t{num_atoms_acceptor2:8d}')
+	print(f'The number of atoms donors 1:\t\t\t{num_atoms_donor1:8d}')
+	print(f'The number of atoms donors 2:\t\t\t{num_atoms_donor2:8d}')
+	print(f'The number of atoms acceptors 1:\t\t{num_atoms_acceptor1:8d}')
+	print(f'The number of atoms acceptors 2:\t\t{num_atoms_acceptor2:8d}')
 
 	donor1_resnums = list(donor1.atoms.resnums)
 	donor2_resnums = list(donor2.atoms.resnums)
 	acceptor1_resnums = list(acceptor1.atoms.resnums)
 	acceptor2_resnums = list(acceptor2.atoms.resnums)
 
-	print(f'The first and last resnums for selection 1:\t{donor1_resnums[0]:5d}{donor1_resnums[-1]:5d}')
-	print(f'The first and last resnums for selection 2:\t{donor2_resnums[0]:5d}{donor2_resnums[-1]:5d}')
-	print(f'The first and last resnums for selection 1:\t{acceptor1_resnums[0]:5d}{acceptor1_resnums[-1]:5d}')
-	print(f'The first and last resnums for selection 2:\t{acceptor2_resnums[0]:5d}{acceptor2_resnums[-1]:5d}')
+	print(f'The first and last resnums for donors 1:\t{donor1_resnums[0]:5d}{donor1_resnums[-1]:5d}')
+	print(f'The first and last resnums for donors 2:\t{donor2_resnums[0]:5d}{donor2_resnums[-1]:5d}')
+	print(f'The first and last resnums for acceptors 1:\t{acceptor1_resnums[0]:5d}{acceptor1_resnums[-1]:5d}')
+	print(f'The first and last resnums for acceptors 2:\t{acceptor2_resnums[0]:5d}{acceptor2_resnums[-1]:5d}')
 
 	donor1_names = names(donor1,num_atoms_donor1)
 	donor2_names = names(donor2,num_atoms_donor2)
@@ -131,16 +132,11 @@ def run():
 	acceptor1_atoms = list(acceptor1.atoms.names)
 	acceptor2_atoms = list(acceptor2.atoms.names)
 
-	print(f'The first and last atoms for selection 1:\t{donor1_atoms[0]:>5s}{donor1_atoms[-1]:>5s}')
-	print(f'The first and last atoms for selection 2:\t{donor2_atoms[0]:>5s}{donor2_atoms[-1]:>5s}')
-	print(f'The first and last atoms for selection 1:\t{acceptor1_atoms[0]:>5s}{acceptor1_atoms[-1]:>5s}')
-	print(f'The first and last atoms for selection 2:\t{acceptor2_atoms[0]:>5s}{acceptor2_atoms[-1]:>5s}')
-
 	for ts in tqdm(u.trajectory[args.first:args.last+1],colour='green',desc='Frames'):
-		temp = contacts(donor1.positions,acceptor2.positions,args.cutoff)
+		temp = contacts(donor1.positions,acceptor2.positions,args.d_cutoff)
 		temp = angle(temp,donor1,acceptor2.positions,u)
 		log(donor1_resnums,acceptor2_resnums,donor1_names,acceptor2_names,donor1_atoms,acceptor2_atoms,args.out,temp,int(ts.frame))
-		temp = contacts(donor2.positions,acceptor1.positions,args.cutoff)
+		temp = contacts(donor2.positions,acceptor1.positions,args.d_cutoff)
 		temp = angle(temp,donor2,acceptor1.positions,u)
 		log(donor2_resnums,acceptor1_resnums,donor2_names,acceptor1_names,donor2_atoms,acceptor1_atoms,args.out,temp,int(ts.frame))
 

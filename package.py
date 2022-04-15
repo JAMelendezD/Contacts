@@ -1,5 +1,4 @@
 import numpy as np
-from numba import jit
 
 def distance_mat(positions,l):
     '''
@@ -24,7 +23,7 @@ def distance_mat(positions,l):
 
 def contacts(positionsA,positionsB,cutoff):
     '''
-    Creates a contact map based on a cutoff of the distances
+    Creates a atom contact map based on a cutoff of the distances
     '''
     subts = positionsA[:,None,:] - positionsB
     distances = np.sqrt(np.einsum('ijk,ijk->ij',subts,subts))
