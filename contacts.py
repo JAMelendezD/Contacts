@@ -104,9 +104,6 @@ def run():
 	sel1_atoms = list(sel1.atoms.names)
 	sel2_atoms = list(sel2.atoms.names)
 
-	print(f'The first and last atoms for selection 1:\t{sel1_atoms[0]:>5s}{sel1_atoms[-1]:>5s}')
-	print(f'The first and last atoms for selection 2:\t{sel2_atoms[0]:>5s}{sel2_atoms[-1]:>5s}')
-
 	for ts in tqdm(u.trajectory[args.first:args.last+1],colour='green',desc='Frames'):
 		temp = contacts(sel1.positions,sel2.positions,args.cutoff)
 		log(sel1_resnums,sel2_resnums,sel1_resids,sel2_resids,
