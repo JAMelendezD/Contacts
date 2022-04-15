@@ -97,6 +97,7 @@ if __name__ == '__main__':
 
 	sel1_resids,sel1_names = res_and_names(sel1,num_atoms_sel1)
 	sel2_resids,sel2_names = res_and_names(sel2,num_atoms_sel2)
+	
 	print(f'The first and last resids for selection 1:\t{sel1_resids[0]:5d}{sel1_resids[-1]:5d}')
 	print(f'The first and last resids for selection 2:\t{sel2_resids[0]:5d}{sel2_resids[-1]:5d}')
 
