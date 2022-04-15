@@ -1,6 +1,7 @@
 import numpy as np
+from numba import jit
 
-def distance(positions,l):
+def distance_mat(positions,l):
     '''
     Calculates a matrix of distances between vectors with periodic boundaries
     '''
@@ -19,3 +20,13 @@ def distance(positions,l):
         closest = np.remainder(pos - positions + l/2.0, l) - l/2.0
         distances[i] = np.sqrt(np.einsum("ij,ij->i", closest, closest))
     return distances
+
+
+def contacts(positionsA,positionsB,cutoff):
+    '''
+    Creates a contact map based on a cutoff of the distances
+    '''
+    subts = positionsA[:,None,:] - positionsB
+    distances = np.sqrt(np.einsum('ijk,ijk->ij',subts,subts))
+    counter = (distances <= cutoff).astype(int)
+    return counter
