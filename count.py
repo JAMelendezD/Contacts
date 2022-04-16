@@ -6,7 +6,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('input', type=str, help='Input text file')
 parser.add_argument('fix_sele1', type=int, help='Number to add to the default resnum for the first selection')
-parser.add_argument('fix_sele2', type=int, help='Number of residues in the first selection')
+parser.add_argument('fix_sele2', type=int, help='Number to add to the default resnum for the second selection')
 parser.add_argument('total_frames', type=int, help='Total number of frames')
 parser.add_argument('out', type=str, help='Output file without extension')
 parser.add_argument('--mode', default=0,required=False, type=int, help='0 counts individual. 1 counts pairs.')
@@ -24,9 +24,9 @@ def count_pair(fname,fix1,fix2):
 			data = line.split()
 			frame = data[0]
 			if data[4] == 'A':
-				pair = data[1]+str(int(data[2])+(fix1-1))+'-'+data[5]+str(int(data[6])+(fix1-1-fix2))
+				pair = data[1]+str(int(data[2])+(fix1-1))+'-'+data[5]+str(int(data[6])+(fix2-1))
 			elif data[4] == 'B':
-				pair = data[5]+str(int(data[6])+(fix1-1))+'-'+data[1]+str(int(data[2])+(fix1-1-fix2))
+				pair = data[5]+str(int(data[6])+(fix1-1))+'-'+data[1]+str(int(data[2])+(fix2-1))
 
 			if frame != previous_frame:
 				previous_frame = frame
@@ -54,10 +54,10 @@ def count_ind(fname,fix1,fix2):
 			frame = data[0]
 			if data[4] == 'A':
 				name1 = data[1]+str(int(data[2])+(fix1-1))
-				name2 = data[5]+str(int(data[6])+(fix1-1-fix2))
+				name2 = data[5]+str(int(data[6])+(fix2-1))
 			elif data[4] == 'B':
 				name1 = data[5]+str(int(data[6])+(fix1-1))
-				name2 = data[1]+str(int(data[2])+(fix1-1-fix2))
+				name2 = data[1]+str(int(data[2])+(fix2-1))
 			if frame != previous_frame:
 				previous_frame = frame
 				ind1_in_frame = []
@@ -81,7 +81,7 @@ def count_ind(fname,fix1,fix2):
 def write(dict_,frames,fout):
 	with open(fout,'w') as f:
 		for item in dict_.items():
-			f.write(f'{item[0]:>5s}{item[1]/frames:>5.4f}\n')
+			f.write(f'{item[0]:>16s}{item[1]/frames:8.4f}\n')
 
 def run():
 	if args.mode == 0:

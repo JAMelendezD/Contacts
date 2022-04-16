@@ -81,8 +81,8 @@ def run():
 	print(f'The number of frames are:\t\t{len_traj:8d}')
 
 	basic1 = u.select_atoms('bynum 1:6557 and (resname ARG LYS) and (name NH* NZ)')
-	acid2 = u.select_atoms('bynum 6558:13114 and (resname ASP GLU) and (name OE* OD*)')
-	basic2 = u.select_atoms('bynum 6558:13114 and (resname ARG LYS) and (name NH* NZ)')
+	acid2 = u.select_atoms('bynum 13115:14918 and (resname ASP GLU) and (name OE* OD*)')
+	basic2 = u.select_atoms('bynum 13115:14918 and (resname ARG LYS) and (name NH* NZ)')
 	acid1 = u.select_atoms('bynum 1:6557 and (resname ASP GLU) and (name OE* OD*)')
 
 	num_atoms_basic1 = len(basic1)
