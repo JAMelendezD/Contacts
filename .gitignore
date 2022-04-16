@@ -10,3 +10,5 @@
 *.tpr
 *.npz
 
+__pycache__/
+
