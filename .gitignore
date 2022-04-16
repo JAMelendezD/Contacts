@@ -7,5 +7,6 @@
 *.xtc
 *.trr
 *.pdb
-
+*.tpr
+*.npz
 
