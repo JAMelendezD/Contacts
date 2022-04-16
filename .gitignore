@@ -1,0 +1,11 @@
+# ignore data files
+*.dat
+*.txt
+
+# ignore gromacs files
+*.gro
+*.xtc
+*.trr
+*.pdb
+
+
