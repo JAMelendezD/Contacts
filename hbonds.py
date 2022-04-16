@@ -26,7 +26,7 @@ def names(selection,num_atoms):
 		sel_names.append(selection.atoms[i].resname)
 	return(sel_names)
 
-def log(sel1_resnums,sel2_resnums,sel1_names,sel2_names,sel1_atoms,sel2_atoms,output,indeces,frame):
+def log(sel1_resnums,sel2_resnums,sel1_names,sel2_names,sel1_atoms,sel2_atoms,sele1,sele2,output,indeces,frame):
 	'''
 	Appends to a log file evertime a contact is found
 	'''
@@ -40,7 +40,7 @@ def log(sel1_resnums,sel2_resnums,sel1_names,sel2_names,sel1_atoms,sel2_atoms,ou
 			res_name2 = sel2_names[j]
 			atom_name1 = sel1_atoms[i]
 			atom_name2 = sel2_atoms[j]
-			f.write(f'{frame:8d}{res_name1:>5s}{res_num1:5d}{atom_name1:>5s}{res_name2:>5s}{res_num2:5d}{atom_name2:>5s}{ele[2]:6.2f}{ele[3]:6.2f}\n')
+			f.write(f'{frame:8d}{res_name1:>5s}{res_num1:5d}{atom_name1:>5s}{sele1:>3s}{res_name2:>5s}{res_num2:5d}{atom_name2:>5s}{sele2:>3s}{ele[2]:6.2f}{ele[3]:6.2f}\n')
 
 @jit(nopython=True)
 def distance(atom1, atom2):
@@ -135,10 +135,10 @@ def run():
 	for ts in tqdm(u.trajectory[args.first:args.last+1],colour='green',desc='Frames'):
 		temp = contacts(donor1.positions,acceptor2.positions,args.d_cutoff)
 		temp = angle(temp,donor1,acceptor2.positions,u)
-		log(donor1_resnums,acceptor2_resnums,donor1_names,acceptor2_names,donor1_atoms,acceptor2_atoms,args.out,temp,int(ts.frame))
+		log(donor1_resnums,acceptor2_resnums,donor1_names,acceptor2_names,donor1_atoms,acceptor2_atoms,'A','B',args.out,temp,int(ts.frame))
 		temp = contacts(donor2.positions,acceptor1.positions,args.d_cutoff)
 		temp = angle(temp,donor2,acceptor1.positions,u)
-		log(donor2_resnums,acceptor1_resnums,donor2_names,acceptor1_names,donor2_atoms,acceptor1_atoms,args.out,temp,int(ts.frame))
+		log(donor2_resnums,acceptor1_resnums,donor2_names,acceptor1_names,donor2_atoms,acceptor1_atoms,'B','A',args.out,temp,int(ts.frame))
 
 
 if __name__ == '__main__':
