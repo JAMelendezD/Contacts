@@ -1,30 +1,3 @@
-'''
-		Julian Melendez 
-	Last edited (03/09/2022)
-
-Program to create a network map between residue 
-pairs given a probability for the connection.
-
-Input file needs to be formatted as:
-
-RES1RESNUM1-RES2RESNUM2 probability
-
-Ex:
-
-LYS503-ASP405 0.58
-GLU180-ARG231 0.78
-
-input: input file to create network
-output: name of the output pdf network
-cutoff: cutoff to plot only contacts above a given probability
-sort: 0-> no sorting, 1-> sorts group1, 2-> sorts both groups
-rev: 0-> nothing, 1-> sorts the second group backwards 
-
-./network input output cutoff --sort [0,1,2] --rev [0,1]    
-
-
-'''
-
 import numpy as np
 import matplotlib.pyplot as plt
 import pygraphviz as pgv
@@ -52,6 +25,10 @@ parser.add_argument('--sort', default=0,required=False, type=int,
 					help='0 minimizes crossings. 1 sorts group1. 2 sorts both groups.')
 parser.add_argument('--rev', default=0,required=False, type=int, 
 					help='0 nothing. 1 inverts the top nodes when already sorted.')
+parser.add_argument('--auxmark', default=0,required=False, type=int, 
+					help='0 default to one marker. 1 adds a different marker.')
+parser.add_argument('--auxfile', default=0,required=False, type=str, 
+					help='File for second marker')
 parser.add_argument('--prob', default=0,required=False, type=int, 
 					help='0 used for strictly probabilities values [0,1]. 1 for values between [-1,1].')
 parser.add_argument('--rowsep', default=1.5,required=False, type=float, 
@@ -59,6 +36,10 @@ parser.add_argument('--rowsep', default=1.5,required=False, type=float,
 parser.add_argument('--nodesep', default=0.05,required=False, type=float, 
 					help='Spacing between the nodes.')
 args = parser.parse_args()
+
+
+if args.auxmark and not args.auxfile:
+	raise FileNotFoundError("Provided the auxiliary marker but no file for it")
 
 inp = args.input
 cutoff = args.cutoff
@@ -68,30 +49,96 @@ reverse = args.rev
 dif = args.prob
 row_sep = str(args.rowsep)
 node_sep = str(args.nodesep)
+aux = args.auxmark
+auxfile = args.auxfile
 
-if dif == 1:
-	cmap = plt.cm.bwr_r
-else:
-	cmap = plt.cm.inferno_r
-colors = cmap(np.linspace(0, 1, 101))
-	
-
-def bash_command(cmd):
-	p = subprocess.Popen(['/bin/bash', '-c', cmd])
-	if p.wait() != 0:
-		print("There was an error")
-	else:
-		return
-
-def scale_lin(num,min_num,max_num,lower_bound,upper_bound):
-	norm = (1-lower_bound)*((num-min_num)/(max_num-min_num))+lower_bound
-	return(norm)
 
 translate = {'ACE': ' ','CYS': 'C','ASP': 'D','SER': 'S','GLN': 'Q', 
      		 'LYS': 'K','ILE': 'I','PRO': 'P','THR': 'T','PHE': 'F', 
      		 'ASN': 'N','GLY': 'G','HIS': 'H','LEU': 'L','ARG': 'R', 
      		 'TRP': 'W','ALA': 'A','VAL': 'V','GLU': 'E','TYR': 'Y', 
      		 'MET': 'M','NME': ' '}
+
+if dif == 1:
+	cmap = plt.cm.bwr_r
+else:
+	cmap = plt.cm.plasma_r
+colors = cmap(np.linspace(0, 1, 101))
+
+def bash_command(cmd):
+	'''
+	Run bash commands
+	'''
+	p = subprocess.Popen(['/bin/bash', '-c', cmd])
+	if p.wait() != 0:
+		print("There was an error")
+	else:
+		return
+
+def scale_lin(num,min_num,max_num,lower_bound):
+	'''
+	Gives a linear interpolation 
+	'''
+	norm = (1-lower_bound)*((num-min_num)/(max_num-min_num))+lower_bound
+	return(norm)
+
+def make_map(pairs,values,aux):
+	'''
+	Creates a dictionary of the appropiate connections and probabilities from 2 lists
+	'''
+	network = {}
+	group2 = []
+	n = len(pairs)
+	for pair in pairs:
+		sep = pair.split('-')
+		res1 = translate[sep[0][0:3]]+sep[0][3:]
+		res2 = translate[sep[1][0:3]]+sep[1][3:]
+		if res1 not in network:
+			network[res1] = []
+		if res2 not in group2:
+			group2.append(res2)
+
+	group1 = list(network.keys())
+	for res in group1:
+		for i in range(n):
+			sep = pairs[i].split('-')
+			res1 = translate[sep[0][0:3]]+sep[0][3:]
+			if res == res1:
+				res2 = translate[sep[1][0:3]]+sep[1][3:]
+				if aux == True:
+					network[res].append((res2,values[i],['both','odot','odot']))
+				else:
+					network[res].append((res2,values[i],['None','None','None']))
+	return(network,group1,group2)
+
+def mod_base_on_aux(map,ordered1,size1,mapaux,aux1,aux2):
+	'''
+	Replaces elements of current map with equal elements found in second map
+	'''
+	for i in range(size1):
+		res = ordered1[i]
+		if res in aux1:
+			contacts = map[res]
+			for j in range(len(contacts)):
+				contact = map[res][j]
+				if contact[0] in aux2:
+					for k in range(j,-1,-1):
+						try:
+							map[res][j] = mapaux[res][k]
+						except:
+							pass
+	return(map)
+
+if aux == 1:
+	# TOFIX For some reason needs at more than one element to read as array
+	pairs = np.loadtxt(auxfile,usecols=0,dtype=str)
+	probs = np.loadtxt(auxfile,usecols=1,dtype=float)
+	indices = np.where(np.abs(probs)>=cutoff)
+	prob_cut_aux = probs[indices]
+	pair_cut_aux = pairs[indices]
+	min_prob_aux = np.min(prob_cut_aux)
+	max_prob_aux = np.max(prob_cut_aux)
+	aux_net, aux1, aux2 = make_map(pair_cut_aux,prob_cut_aux,aux=True)
 
 pairs = np.loadtxt(inp,usecols=0,dtype=str)
 probs = np.loadtxt(inp,usecols=1,dtype=float)
@@ -104,33 +151,29 @@ min_prob = np.min(prob_cut)
 max_prob = np.max(prob_cut)
 lim = np.max([abs(min_prob),abs(max_prob)])
 
+if aux == 1:
+	min_prob = np.min([abs(min_prob),abs(min_prob_aux)])
+	max_prob = np.max([abs(max_prob),abs(max_prob_aux)])
+	lim = np.max([abs(min_prob),abs(max_prob)])
+
 print('Number of pairs under the cutoff ({}): {}'.format(cutoff,n))
 
-network = {}
-group2 = []
-for pair in pair_cut:
-    sep = pair.split('-')
-    res1 = translate[sep[0][0:3]]+sep[0][3:]
-    res2 = translate[sep[1][0:3]]+sep[1][3:]
-    if res1 not in network:
-        network[res1] = []
-    if res2 not in group2:
-    	group2.append(res2)
+network, group1, group2 = make_map(pair_cut, prob_cut,aux=False)
 
-group1 = list(network.keys())
 len_group1 = len(group1)
 len_group2 = len(group2)
-for res in group1:
-	for i in range(n):
-		sep = pair_cut[i].split('-')
-		res1 = translate[sep[0][0:3]]+sep[0][3:]
-		if res == res1:
-			res2 = translate[sep[1][0:3]]+sep[1][3:]
-			network[res].append((res2,prob_cut[i]))
-
 
 ordered1 = sorted(group1, key=lambda x: int(x[1:]))
 ordered2 = sorted(group2, key=lambda x: int(x[1:]))
+
+'''
+Assumes probability of first map is always smaller if found in second map.
+Therefore for a given cutoff for first map will always find one in second map.
+If it doesnt appear in first map it will not appear at all even if present in second map.
+'''
+if aux == 1:
+	network = mod_base_on_aux(network,ordered1,len_group1,aux_net,aux1,aux2)
+
 C = pgv.AGraph() 
 C.node_attr['style']='filled'
 C.node_attr['shape']='circle'
@@ -138,6 +181,13 @@ C.node_attr['height'] =0.80
 C.node_attr['fixedsize']='true'
 C.node_attr['fontcolor']='#000000'
 C.node_attr['fillcolor']='#FFE4B5'
+
+if aux == 1:
+	for i in range(len_group1):
+		res = ordered1[i]
+		contacts = network[res]
+		for j in range(len(contacts)):
+			contact = network[res][j]
 
 for i in range(len_group1):
 	res = ordered1[i]
@@ -149,13 +199,12 @@ for i in range(len_group1):
 		contact = network[res][j]
 		if dif == 0:
 			C.add_edge(contact[0],' '+res+' ',
-				color=cm.colors.to_hex(colors[int(scale_lin(contact[1],min_prob,max_prob,0,1)*100)]),
-				penwidth=2.0)
+				color=cm.colors.to_hex(colors[int(scale_lin(contact[1],min_prob,max_prob,0)*100)]),
+				penwidth=2.0, dir=contact[2][0],arrowtail=contact[2][1],arrowhead=contact[2][2])
 		elif dif == 1:
-			print(contact[1])
 			C.add_edge(contact[0],' '+res+' ',
-				color=cm.colors.to_hex(colors[int(scale_lin(contact[1],-lim,lim,0,1)*100)]),
-				penwidth=2.0)
+				color=cm.colors.to_hex(colors[int(scale_lin(contact[1],-lim,lim,0)*100)]),
+				penwidth=2.0, dir=contact[2][0],arrowtail=contact[2][1],arrowhead=contact[2][2])
 	n=C.get_node(' '+res+' ')
 	n.attr['fillcolor']='#B0C4DE'
 
@@ -218,5 +267,3 @@ else:
 	cmap=cmap,norm=mpl.colors.Normalize(cutoff, 1.0),format=FuncFormatter(fmt))
 direc = os.path.dirname(out)
 plt.savefig("{}colorbar.pdf".format(direc),bbox_inches='tight')
-
-
