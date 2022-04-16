@@ -10,5 +10,13 @@
 *.tpr
 *.npz
 
+# ignore images
+*.png
+*.pdf
+*.jpg
+*.svg
+*.dot
+
 __pycache__/
+results/
 
