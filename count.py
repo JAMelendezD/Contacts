@@ -81,7 +81,7 @@ def count_ind(fname,fix1,fix2):
 def write(dict_,frames,fout):
 	with open(fout,'w') as f:
 		for item in dict_.items():
-			f.write(f'{item[0]:>5s}{item[1]/frames:>5.2f}\n')
+			f.write(f'{item[0]:>5s}{item[1]/frames:>5.4f}\n')
 
 def run():
 	if args.mode == 0:
