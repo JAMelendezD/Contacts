@@ -101,10 +101,13 @@ def run():
 	
 	print(f'The number of frames are:\t\t\t{len_traj:8d}')
 
-	donor1 = u.select_atoms('bynum 1:6557 and name O* and bonded name H*', 'bynum 1:6557 and name N* and bonded name H*')
-	acceptor2 = u.select_atoms('bynum 13115:14918 and name O*', 'bynum 13115:14918 and name N*')
-	donor2 = u.select_atoms('bynum 13115:14918 and name O* and bonded name H*', 'bynum 13115:14918 and name N* and bonded name H*')
-	acceptor1 = u.select_atoms('bynum 1:6557 and name O*', 'bynum 1:6557 and name N*')
+	sele1 = 'bynum 1:6557'
+	sele2 = 'bynum 13115:14918'
+
+	donor1 = u.select_atoms(f'{sele1} and name O* and bonded name H*', f'{sele1} and name N* and bonded name H*',f'{sele1} and name S* and bonded name H*')
+	acceptor2 = u.select_atoms(f'{sele2} and name O*', f'{sele2} and name N*')
+	donor2 = u.select_atoms(f'{sele2} and name O* and bonded name H*', f'{sele2} and name N* and bonded name H*',f'{sele2} and name S* and bonded name H*')
+	acceptor1 = u.select_atoms(f'{sele1} and name O*', f'{sele1} and name N*')
 
 	num_atoms_donor1 = len(donor1)
 	num_atoms_donor2 = len(donor2)

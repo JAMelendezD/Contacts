@@ -80,12 +80,15 @@ def run():
 	
 	print(f'The number of frames are:\t\t\t{len_traj:8d}')
 
-	sel1 = u.select_atoms('bynum 1:6557 and not name H*')
-	sel2 = u.select_atoms('bynum 13115:14918 and not name H*')
+	sele1 = 'bynum 1:6557'
+	sele2 = 'bynum 13115:14918'
+
+	#sel1 = u.select_atoms(f'{sele1} and not name H*')
+	#sel2 = u.select_atoms(f'{sele2}  and not name H*')
 
 	# hydrophobic contacts
-	#sel1 = u.select_atoms('bynum 1:6557 and name C* and (resname ALA or resname VAL or resname PHE or resname LEU or resname ILE or resname TRP or resname PRO or resname MET)')
-	#sel2 = u.select_atoms('bynum 6558:13114 and name C* and (resname ALA or resname VAL or resname PHE or resname LEU or resname ILE or resname TRP or resname PRO or resname MET)')
+	sel1 = u.select_atoms(f'{sele1} and name C* and (resname ALA or resname VAL or resname PHE or resname LEU or resname ILE or resname TRP or resname PRO or resname MET)')
+	sel2 = u.select_atoms(f'{sele2} and name C* and (resname ALA or resname VAL or resname PHE or resname LEU or resname ILE or resname TRP or resname PRO or resname MET)')
 
 	num_atoms_sel1 = len(sel1)
 	num_atoms_sel2 = len(sel2)
