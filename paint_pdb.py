@@ -18,7 +18,6 @@ def splitm(line):
 			line[21:22].strip(),line[22:26].strip(),line[26:27].strip(),line[30:38].strip(),line[38:46].strip(),
 			line[46:54].strip(),line[54:60].strip(),line[60:66].strip(),line[76:78].strip(),line[78:80].strip()])
 
-
 def create_dict(fname):
 	map = {}
 	with open(fname,'r') as f:
