@@ -8,7 +8,7 @@ from os.path import exists
 ### Arguments ###
 
 parser = argparse.ArgumentParser()
-parser.add_argument('top', type=str, help='gro or tpr file')
+parser.add_argument('top', type=str, help='tpr file')
 parser.add_argument('traj', type=str, help='trajectory file')
 parser.add_argument('first', type=int, help='First frame starts at 0')
 parser.add_argument('last', type=int, help='Last frame inclusive')
@@ -16,18 +16,16 @@ parser.add_argument('d_cutoff', type=float, help='distance cutoff to define the 
 parser.add_argument('out', type=str, help='output file')
 args = parser.parse_args()
 
-def res_and_names(selection,num_atoms):
+def names(selection,num_atoms):
 	'''
-	Function to get the residue ids and the residue names and store them in lists for a given selection
+	Function to get the residue names and store them in lists for a given selection
 	'''
-	sel_resids = np.zeros(num_atoms,dtype=int)
 	sel_names = []
 	for i in range(num_atoms):
-		sel_resids[i] = selection.atoms[i].resindex+1
 		sel_names.append(selection.atoms[i].resname)
-	return(sel_resids,sel_names)
+	return(sel_names)
 
-def log(resnames1,resnames2,resids1,resids2,names1,names2,atoms1,atoms2,output,indeces,frame):
+def log(sel1_resnums,sel2_resnums,sel1_names,sel2_names,sel1_atoms,sel2_atoms,sele1,sele2,output,indeces,frame):
 	'''
 	Appends to a log file evertime a contact is found
 	'''
@@ -35,15 +33,13 @@ def log(resnames1,resnames2,resids1,resids2,names1,names2,atoms1,atoms2,output,i
 		for ele in indeces:
 			i = int(ele[0])
 			j = int(ele[1])
-			res_num1 = resnames1[i]
-			res_num2 = resnames2[j]
-			res_id1 = resids1[i]
-			res_id2 = resids2[j]
-			res_name1 = names1[i]
-			res_name2 = names2[j]
-			atom_name1 = atoms1[i]
-			atom_name2 = atoms2[j]
-			f.write(f'{frame:8d}{res_name1:>5s}{res_num1:5d}{res_id1:5d}{atom_name1:>5s}{res_name2:>5s}{res_num2:5d}{res_id2:5d}{atom_name2:>5s}{ele[2]:6.2f}\n')
+			res_num1 = sel1_resnums[i]
+			res_num2 = sel2_resnums[j]
+			res_name1 = sel1_names[i]
+			res_name2 = sel2_names[j]
+			atom_name1 = sel1_atoms[i]
+			atom_name2 = sel2_atoms[j]
+			f.write(f'{frame:8d}{res_name1:>5s}{res_num1:5d}{atom_name1:>5s}{sele1:>3s}{res_name2:>5s}{res_num2:5d}{atom_name2:>5s}{sele2:>3s}{ele[2]:6.2f}\n')
 
 @jit(nopython=True)
 def distance(atom1, atom2):
@@ -72,7 +68,11 @@ def contacts(positions1,positions2,cutoff):
 def run():
 	if exists(args.out):
 		raise FileExistsError(f'File {args.out} exists in current directory')
-			
+	if args.top.endswith('.tpr'):
+		pass
+	else:
+		raise ValueError("Extension for topology must be .tpr")
+
 	print(f'MDA version: {mda.__version__}')
 
 	u = mda.Universe(args.top,args.traj) # Works only with .gro files since mda renumerates the .tpr
@@ -93,26 +93,21 @@ def run():
 	print(f'The number of atoms in selection 1:\t\t{num_atoms_sel1:8d}')
 	print(f'The number of atoms in selection 2:\t\t{num_atoms_sel2:8d}')
 
-	sel1_resids,sel1_names = res_and_names(sel1,num_atoms_sel1)
-	sel2_resids,sel2_names = res_and_names(sel2,num_atoms_sel2)
+	sel1_names = names(sel1,num_atoms_sel1)
+	sel2_names = names(sel2,num_atoms_sel2)
 	
-	sel1_resnums = sel1.resnums
-	sel2_resnums = sel2.resnums
+	sel1_resnums = list(sel1.atoms.resnums)
+	sel2_resnums = list(sel2.atoms.resnums)
 
 	print(f'The first and last resnums for selection 1:\t{sel1_resnums[0]:5d}{sel1_resnums[-1]:5d}')
 	print(f'The first and last resnums for selection 2:\t{sel2_resnums[0]:5d}{sel2_resnums[-1]:5d}')
-
-	print(f'The first and last resids for selection 1:\t{sel1_resids[0]:5d}{sel1_resids[-1]:5d}')
-	print(f'The first and last resids for selection 2:\t{sel2_resids[0]:5d}{sel2_resids[-1]:5d}')
 
 	sel1_atoms = list(sel1.atoms.names)
 	sel2_atoms = list(sel2.atoms.names)
 
 	for ts in tqdm(u.trajectory[args.first:args.last+1],colour='green',desc='Frames'):
 		temp = contacts(sel1.positions,sel2.positions,args.d_cutoff)
-		log(sel1_resnums,sel2_resnums,sel1_resids,sel2_resids,
-		    sel1_names,sel2_names,sel1_atoms,sel2_atoms,
-			args.out,temp,int(ts.frame))
+		log(sel1_resnums,sel2_resnums,sel1_names,sel2_names,sel1_atoms,sel2_atoms,'A','B',args.out,temp,int(ts.frame))
 
 if __name__ == '__main__':
 	run()

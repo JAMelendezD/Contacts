@@ -8,7 +8,7 @@ from os.path import exists
 ### Arguments ###
 
 parser = argparse.ArgumentParser()
-parser.add_argument('top', type=str, help='gro or tpr file')
+parser.add_argument('top', type=str, help='tpr file')
 parser.add_argument('traj', type=str, help='trajectory file')
 parser.add_argument('first', type=int, help='First frame starts at 0')
 parser.add_argument('last', type=int, help='Last frame inclusive')
@@ -68,6 +68,10 @@ def contacts(positions1,positions2,cutoff):
 def run():
 	if exists(args.out):
 		raise FileExistsError(f'File {args.out} exists in current directory')
+	if args.top.endswith('.tpr'):
+		pass
+	else:
+		raise ValueError("Extension for topology must be .tpr")
 	
 	print(f'MDA version: {mda.__version__}')
 
