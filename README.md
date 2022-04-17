@@ -22,15 +22,30 @@ python count.py hbonds.txt 184 -816 26102 hbonds_count --mode 1
 ```
 python time_series.py hbonds.txt hbonds_count.dat 184 -816 26102 0.02 0.1 hbond_series
 ```
+
+<p align="center">
+  <img width="500" src="images/rbd.png">
+</p>
+
 ## Create network maps
 
 ```
 python network.py hbonds_count.dat hbond_salt 0.1 --auxmark 1 --auxfile salt_count.dat --rowsep 0.7
 python network.py phobic_count.dat phobic 0.1 --rowsep 0.7
 ```
+
+<p align="center">
+  <img width="500" src="images/rbd.png">
+</p>
+
 ## Map value to a pdb file
 
 ```
 python paint_pdb.py protein.pdb hbonds_count_1.dat A tmp.pdb
 python paint_pdb.py tmp.pdb hbonds_count_2.dat B final.pdb
 ```
+
+<p align="center">
+  <img width="500" src="images/rbd.png">
+  <img width="500" src="images/slam.png">
+</p>
