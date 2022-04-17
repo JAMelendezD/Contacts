@@ -116,7 +116,7 @@ def save_plot_matrix(matrix,cmap,names,frames,dt,output):
 	cbar.ax.set_xticklabels(np.arange(upper_lim+1))
 	ax.set_yticks(np.arange(len(names)))
 	ax.set_yticklabels(names)
-	ax.set_xticks(np.arange(0,frames,5000))
+	ax.set_xticks(np.arange(0,frames,50000))
 	x_labels = np.array(ax.get_xticks().tolist())*dt
 	ax.set_xticklabels(np.array(x_labels,dtype=int))
 	ax.xaxis.set_label_position('top')

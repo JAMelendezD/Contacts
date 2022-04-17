@@ -3,6 +3,7 @@ import MDAnalysis as mda
 import argparse
 from numba import jit
 from tqdm import tqdm
+import warnings
 from os.path import exists
 
 ### Arguments ###
@@ -82,7 +83,18 @@ def angle(hbonds,donors,acceptors_pos,universe):
 				H_pos = possible_h.position
 				dif1 = acceptor_pos-donor_pos
 				dif2 = H_pos-donor_pos
-				angle = np.rad2deg(np.arccos(np.dot(dif1,dif2)/(np.linalg.norm(dif1)*np.linalg.norm(dif2))))
+				theta = np.dot(dif1,dif2)/(np.linalg.norm(dif1)*np.linalg.norm(dif2))
+				with warnings.catch_warnings():
+					warnings.filterwarnings('error')
+					try:
+						angle = np.rad2deg(np.arccos(theta))
+					except:
+						if theta < 0:
+							theta = np.maximum(-1,theta)
+							angle = np.rad2deg(np.arccos(theta))
+						elif theta > 0:
+							theta = np.minimum(1,theta)
+							angle = np.rad2deg(np.arccos(theta))
 				if angle <= args.ang_cutoff:
 					ele.append(angle)
 					result.append(ele)

@@ -11,7 +11,7 @@ python hbonds.py protein.tpr protein_nj_fitbb.xtc 0 999999 3.5 30.0 "bynum 1:655
 ```
 ## Count the number of contacts individually and by pairs
 
-Using the generated text files creates a dat file with the count by pairs mode 0 or individual mode 1.
+Using the generated text files creates a dat file with the count by pairs mode 0 or individual mode 1. Selection 1 first residue starts at 184 here it gets corrected from MDanalysis renumbering starting at 1. There are 848 residues before the second selection and this one must starts at 32 therefore -816 (-848+32) corrects it. 
 
 ```
 python count.py hbonds.txt 184 -816 26102 hbonds_count --mode 0
@@ -24,7 +24,8 @@ python time_series.py hbonds.txt hbonds_count.dat 184 -816 26102 0.02 0.1 hbond_
 ```
 
 <p align="center">
-  <img width="500" src="images/rbd.png">
+  <img width="500" src="images/hbond_series_mat.png">
+  <img width="500" src="images/hbond_series.png">
 </p>
 
 ## Create network maps
