@@ -66,8 +66,8 @@ def contacts(positions1,positions2,cutoff):
 	return out
 
 def run():
-	if exists(args.out):
-		raise FileExistsError(f'File {args.out} exists in current directory')
+	if exists(args.out+'.txt'):
+		raise FileExistsError(f'File {args.out+".txt"} exists in current directory')
 	if args.top.endswith('.tpr'):
 		pass
 	else:
@@ -120,9 +120,9 @@ def run():
 
 	for ts in tqdm(u.trajectory[args.first:args.last+1],colour='green',desc='Frames'):
 		temp = contacts(basic1.positions,acid2.positions,args.d_cutoff)
-		log(basic1_resnums,acid2_resnums,basic1_names,acid2_names,basic1_atoms,acid2_atoms,'A','B',args.out,temp,int(ts.frame))
+		log(basic1_resnums,acid2_resnums,basic1_names,acid2_names,basic1_atoms,acid2_atoms,'A','B',args.out+'.txt',temp,int(ts.frame))
 		temp = contacts(basic2.positions,acid1.positions,args.d_cutoff)
-		log(basic2_resnums,acid1_resnums,basic2_names,acid1_names,basic2_atoms,acid1_atoms,'B','A',args.out,temp,int(ts.frame))
+		log(basic2_resnums,acid1_resnums,basic2_names,acid1_names,basic2_atoms,acid1_atoms,'B','A',args.out+'.txt',temp,int(ts.frame))
 
 
 if __name__ == '__main__':

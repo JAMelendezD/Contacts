@@ -52,7 +52,6 @@ node_sep = str(args.nodesep)
 aux = args.auxmark
 auxfile = args.auxfile
 
-
 translate = {'ACE': ' ','CYS': 'C','ASP': 'D','SER': 'S','GLN': 'Q', 
      		 'LYS': 'K','ILE': 'I','PRO': 'P','THR': 'T','PHE': 'F', 
      		 'ASN': 'N','GLY': 'G','HIS': 'H','LEU': 'L','ARG': 'R', 
@@ -130,7 +129,7 @@ def mod_base_on_aux(map,ordered1,size1,mapaux,aux1,aux2):
 	return(map)
 
 if aux == 1:
-	# TOFIX For some reason needs at more than one element to read as array
+	# TOFIX For some reason needs more than one element to read as array
 	pairs = np.loadtxt(auxfile,usecols=0,dtype=str)
 	probs = np.loadtxt(auxfile,usecols=1,dtype=float)
 	indices = np.where(np.abs(probs)>=cutoff)
@@ -265,5 +264,4 @@ if dif == 1:
 else:
 	cb = mpl.colorbar.ColorbarBase(ax, orientation='horizontal',
 	cmap=cmap,norm=mpl.colors.Normalize(cutoff, 1.0),format=FuncFormatter(fmt))
-direc = os.path.dirname(out)
-plt.savefig("{}colorbar.pdf".format(direc),bbox_inches='tight')
+plt.savefig("{}_colorbar.pdf".format(out),bbox_inches='tight')

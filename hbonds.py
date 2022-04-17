@@ -87,8 +87,8 @@ def angle(hbonds,donors,acceptors_pos,universe):
 	return(result)
 
 def run():
-	if exists(args.out):
-		raise FileExistsError(f'File {args.out} exists in current directory')
+	if exists(args.out+'.txt'):
+		raise FileExistsError(f'File {args.out+".txt"} exists in current directory')
 	if args.top.endswith('.tpr'):
 		pass
 	else:
@@ -142,10 +142,10 @@ def run():
 	for ts in tqdm(u.trajectory[args.first:args.last+1],colour='green',desc='Frames'):
 		temp = contacts(donor1.positions,acceptor2.positions,args.d_cutoff)
 		temp = angle(temp,donor1,acceptor2.positions,u)
-		log(donor1_resnums,acceptor2_resnums,donor1_names,acceptor2_names,donor1_atoms,acceptor2_atoms,'A','B',args.out,temp,int(ts.frame))
+		log(donor1_resnums,acceptor2_resnums,donor1_names,acceptor2_names,donor1_atoms,acceptor2_atoms,'A','B',args.out+'.txt',temp,int(ts.frame))
 		temp = contacts(donor2.positions,acceptor1.positions,args.d_cutoff)
 		temp = angle(temp,donor2,acceptor1.positions,u)
-		log(donor2_resnums,acceptor1_resnums,donor2_names,acceptor1_names,donor2_atoms,acceptor1_atoms,'B','A',args.out,temp,int(ts.frame))
+		log(donor2_resnums,acceptor1_resnums,donor2_names,acceptor1_names,donor2_atoms,acceptor1_atoms,'B','A',args.out+'.txt',temp,int(ts.frame))
 
 
 if __name__ == '__main__':
