@@ -1,4 +1,6 @@
 
+mkdir $4
+
 startres1=184
 resbefore2=816
 frames=26102
@@ -13,7 +15,7 @@ for name in phobic salt hbonds
 do
     for i in 0 1
     do
-       python count.py ./${4}/${name}_${3}.txt $startres1 -$resbefore2 $frames ./${4}/${name}_count_${5} --mode $i
+       python count.py ./${4}/${name}_${5}.txt $startres1 -$resbefore2 $frames ./${4}/${name}_count_${5} --mode $i
     done
     if [ $name == hbonds ]
     then
