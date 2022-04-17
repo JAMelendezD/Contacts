@@ -13,6 +13,8 @@ parser.add_argument('traj', type=str, help='trajectory file')
 parser.add_argument('first', type=int, help='First frame starts at 0')
 parser.add_argument('last', type=int, help='Last frame inclusive')
 parser.add_argument('d_cutoff', type=float, help='D-A distance cutoff to define the contacts')
+parser.add_argument('sele1', type=str, help='main selection 1')
+parser.add_argument('sele2', type=str, help='main selection 2')
 parser.add_argument('out', type=str, help='output file')
 args = parser.parse_args()
 
@@ -80,8 +82,8 @@ def run():
 	
 	print(f'The number of frames are:\t\t{len_traj:8d}')
 
-	sele1 = 'bynum 1:6557'
-	sele2 = 'bynum 13115:14918'
+	sele1 = args.sele1
+	sele2 = args.sele2
 
 	basic1 = u.select_atoms(f'{sele1} and (resname ARG LYS) and (name NH* NZ)')
 	acid2 = u.select_atoms(f'{sele2} and (resname ASP GLU) and (name OE* OD*)')
