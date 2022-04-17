@@ -46,6 +46,6 @@ python paint_pdb.py tmp.pdb hbonds_count_2.dat B final.pdb
 ```
 
 <p align="center">
-  <img width="200" src="images/rbd.png">
-  <img width="200" src="images/slam.png">
+  <img width="250" src="images/rbd.png">
+  <img width="250" src="images/slam.png">
 </p>
