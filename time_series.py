@@ -111,7 +111,7 @@ def save_plot_matrix(matrix,cmap,names,frames,dt,output):
 	fig = plt.figure(figsize = (15,8))
 	fig = plt.imshow(matrix,interpolation='none',cmap=cmap, aspect = 'auto')
 	ax = plt.gca()
-	cbar = plt.colorbar(fig, fraction=0.05, pad=0.05, orientation = 'horizontal', ticks=np.arange(0.45,upper_lim+0.5,1.01))
+	cbar = plt.colorbar(fig, fraction=0.05, pad=0.05, orientation = 'horizontal', ticks=np.arange(0.45,upper_lim+0.9,1.01))
 	plt.clim(0,upper_lim+1)
 	cbar.ax.set_xticklabels(np.arange(upper_lim+1))
 	ax.set_yticks(np.arange(len(names)))
