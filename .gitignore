@@ -9,6 +9,7 @@
 *.pdb
 *.tpr
 *.npz
+*.log
 
 # ignore images
 *.png
