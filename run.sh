@@ -2,8 +2,10 @@
 mkdir $4
 frames=$(python get_frames.py $1 $2 2>&1)  
 
-sele1="bynum 1:6557"
-sele2="bynum 13115:14918"
+#sele1="bynum 1:6557"
+#sele2="bynum 13115:14918"
+sele1="bynum 6558:13114"
+sele2="bynum 14919:16720"
 startres1=184
 resbefore2=816
 dt=0.02
