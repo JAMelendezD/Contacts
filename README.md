@@ -36,7 +36,7 @@ python network.py phobic_count.dat phobic 0.1 --rowsep 0.7
 ```
 
 <p align="center">
-  <img width="500" src="images/rbd.png">
+  <img width="1000" src="images/combine.png">
 </p>
 
 ## Map value to a pdb file
