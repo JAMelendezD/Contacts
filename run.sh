@@ -36,8 +36,8 @@ do
     fi
 done
 
-python network.py ./${4}/hbonds_count.dat ./${4}/hbond_salt 0.1 --auxmark 1 --auxfile ./${4}/salt_count.dat --rowsep 0.7 >> ${4}.log 2>/dev/null
-python network.py ./${4}/phobic_count.dat ./${4}/phobic 0.1 --rowsep 0.7 >> ${4}.log 2>/dev/null
+python network.py ./${4}/hbonds_count.dat ./${4}/hbond_salt $cutoff --auxmark 1 --auxfile ./${4}/salt_count.dat --rowsep 0.7 >> ${4}.log 2>/dev/null
+python network.py ./${4}/phobic_count.dat ./${4}/phobic $cutoff --rowsep 0.7 >> ${4}.log 2>/dev/null
 
 python paint_pdb.py $3 ./${4}/hbonds_count_1.dat $chain1 ./${4}/tmp.pdb >> ${4}.log 2>/dev/null
 python paint_pdb.py ./${4}/tmp.pdb ./${4}/hbonds_count_2.dat $chain2 ./${4}/final.pdb >> ${4}.log 2>/dev/null

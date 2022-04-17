@@ -98,7 +98,7 @@ def run():
 	
 	print(f'MDA version: {mda.__version__}')
 
-	u = mda.Universe(args.top,args.traj) # Works only with .gro files since mda renumerates the .tpr
+	u = mda.Universe(args.top,args.traj)
 	len_traj = len(u.trajectory)
 	
 	print(f'The number of frames are:\t\t\t{len_traj:8d}')
