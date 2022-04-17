@@ -15,6 +15,7 @@ parser.add_argument('last', type=int, help='Last frame inclusive')
 parser.add_argument('d_cutoff', type=float, help='distance cutoff to define the contacts')
 parser.add_argument('sele1', type=str, help='main selection 1')
 parser.add_argument('sele2', type=str, help='main selection 2')
+parser.add_argument('--mode', default=0,required=False, type=int, help='0 hydrophobic contacts. 1 all contacts')
 parser.add_argument('out', type=str, help='output file')
 args = parser.parse_args()
 
@@ -85,12 +86,14 @@ def run():
 	sele1 = args.sele1
 	sele2 = args.sele2
 
-	#sel1 = u.select_atoms(f'{sele1} and not name H*')
-	#sel2 = u.select_atoms(f'{sele2}  and not name H*')
-
-	# hydrophobic contacts
-	sel1 = u.select_atoms(f'{sele1} and name C* and (resname ALA or resname VAL or resname PHE or resname LEU or resname ILE or resname TRP or resname PRO or resname MET)')
-	sel2 = u.select_atoms(f'{sele2} and name C* and (resname ALA or resname VAL or resname PHE or resname LEU or resname ILE or resname TRP or resname PRO or resname MET)')
+	if args.mode == 0:
+		sel1 = u.select_atoms(f'{sele1} and name C* and (resname ALA or resname VAL or resname PHE or resname LEU or resname ILE or resname TRP or resname PRO or resname MET)')
+		sel2 = u.select_atoms(f'{sele2} and name C* and (resname ALA or resname VAL or resname PHE or resname LEU or resname ILE or resname TRP or resname PRO or resname MET)')
+	elif args.mode == 1:
+		sel1 = u.select_atoms(f'{sele1} and not name H*')
+		sel2 = u.select_atoms(f'{sele2}  and not name H*')
+	else:
+		raise ValueError('Mode does not exists')
 
 	num_atoms_sel1 = len(sel1)
 	num_atoms_sel2 = len(sel2)
