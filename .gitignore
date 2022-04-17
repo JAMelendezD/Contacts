@@ -18,5 +18,4 @@
 *.dot
 
 __pycache__/
-results/
-
+**/
