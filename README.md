@@ -18,8 +18,6 @@ python count.py hbonds.txt 184 -816 26102 hbonds_count --mode 0
 python count.py hbonds.txt 184 -816 26102 hbonds_count --mode 1
 ```
 
-blaaaa
-
 ## Generate a time series
 
 ```
