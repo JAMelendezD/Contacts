@@ -10,7 +10,7 @@ args = parser.parse_args()
 
 def run():
 
-	u = mda.Universe(args.top,args.traj) # Works only with .gro files since mda renumerates the .tpr
+	u = mda.Universe(args.top,args.traj)
 	len_traj = len(u.trajectory)
 	print(len_traj)
 

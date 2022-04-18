@@ -210,7 +210,7 @@ def run():
 
 	blocks,error,block_mean = make_block_average(series[:,1])
 	save_plot_block(blocks,error,block_mean,args.out)
-	sem = np.mean(error[-3:])
+	sem = error[-1]
 	save_plot_total(series,args.out,sem)
 
 	matrix, possible_dic = init_matrix(args.input_map,args.cutoff,args.total_frames)
