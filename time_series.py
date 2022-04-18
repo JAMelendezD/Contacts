@@ -111,7 +111,7 @@ def save_plot_matrix(matrix,cmap,names,frames,dt,output):
 	'''
 	upper_lim = np.max(matrix)
 	cmap = plt.get_cmap(cmap, upper_lim+1)
-	fig = plt.figure(figsize = (15,8))
+	fig = plt.figure(figsize = (16,8))
 	fig = plt.imshow(matrix,interpolation='none',cmap=cmap, aspect = 'auto')
 	ax = plt.gca()
 	cbar = plt.colorbar(fig, fraction=0.05, pad=0.05, orientation = 'horizontal', ticks=np.arange(0.45,upper_lim+1,1.01))
@@ -119,7 +119,7 @@ def save_plot_matrix(matrix,cmap,names,frames,dt,output):
 	cbar.ax.set_xticklabels(np.arange(upper_lim+1))
 	ax.set_yticks(np.arange(len(names)))
 	ax.set_yticklabels(names)
-	ax.set_xticks(np.arange(0,frames,50000))
+	ax.set_xticks(np.arange(0,frames,frames//10))
 	x_labels = np.array(ax.get_xticks().tolist())*dt
 	ax.set_xticklabels(np.array(x_labels,dtype=int))
 	ax.xaxis.set_label_position('top')
@@ -140,8 +140,9 @@ def save_plot_total(series,out,sem):
 	plt.plot(x,y,color='coral')
 	plt.axhline(np.mean(y),0,1,color='k',ls='--')
 	plt.xlim(np.min(x),np.max(x))
+	plt.xlabel('Time (ns)')
 	label = str(round(np.mean(y),1))+r'$\pm$'+str(round(sem,1))
-	plt.text(np.max(x)+np.max(x)/100,np.mean(y),label)
+	plt.text(np.max(x)-np.max(x)/9,np.mean(y)*1.02,label)
 	plt.savefig(out+'.png',dpi=300,bbox_inches='tight')
 	return
 
@@ -149,14 +150,14 @@ def save_plot_block(blocks,error,block_mean,out):
 	'''
 	Plots the standard error of the mean as a function of block size
 	'''
-	fig = plt.figure(figsize = (7,4))
+	fig = plt.figure(figsize = (8,4))
 	plt.plot(blocks, error, color ='k')
 	plt.scatter(blocks, error, edgecolor = 'k', color = 'green', zorder=10)
-	plt.xlabel('Block Size (ns)')
-	plt.ylabel(r'SEM')
+	plt.xlabel('Block Size')
+	plt.ylabel('SEM')
 	plt.savefig(out+'block_average.png',dpi=300,bbox_inches='tight')
 
-	fig = plt.figure(figsize = (7,4))
+	fig = plt.figure(figsize = (8,4))
 	plt.errorbar(blocks, block_mean, yerr=error, capsize = 2, color ='coral')
 	plt.scatter(blocks, block_mean, edgecolor = 'k', color ='coral', zorder=10)
 	plt.xlabel('Block Size')
@@ -169,6 +170,7 @@ def make_block_average(data):
 	Block averaging procedure for a time series
 	'''
 	sdata = len(data)
+	# If size data is odd remove the first data point. Even data points divide better in equal size blocks
 	if sdata%2 == 1:
 		data = data[1:] 
 		sdata = sdata-1
