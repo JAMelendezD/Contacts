@@ -106,6 +106,9 @@ def fill_matrix(fname,matrix,possible,fix1,fix2,mode):
 	return(matrix,keys) 
 
 def save_plot_matrix(matrix,cmap,names,frames,dt,output):
+	'''
+	Makes a image plot of each pair as a row as a function of time
+	'''
 	upper_lim = np.max(matrix)
 	cmap = plt.get_cmap(cmap, upper_lim+1)
 	fig = plt.figure(figsize = (15,8))
@@ -127,16 +130,72 @@ def save_plot_matrix(matrix,cmap,names,frames,dt,output):
 	plt.savefig(output+'_mat.png', dpi = 300)
 	return
 
-def save_plot_total(series,out):
+def save_plot_total(series,out,sem):
+	'''
+	Plot the time series
+	'''
 	fig = plt.figure(figsize=(8,4))
 	x = series[:,0]
 	y = series[:,1]
 	plt.plot(x,y,color='coral')
 	plt.axhline(np.mean(y),0,1,color='k',ls='--')
 	plt.xlim(np.min(x),np.max(x))
-	plt.text(np.max(x)+np.max(x)/100,np.mean(y),str(round(np.mean(y),1)))
+	label = str(round(np.mean(y),1))+r'$\pm$'+str(round(sem,1))
+	plt.text(np.max(x)+np.max(x)/100,np.mean(y),label)
 	plt.savefig(out+'.png',dpi=300,bbox_inches='tight')
 	return
+
+def save_plot_block(blocks,error,block_mean,out):
+	'''
+	Plots the standard error of the mean as a function of block size
+	'''
+	fig = plt.figure(figsize = (7,4))
+	plt.plot(blocks, error, color ='k')
+	plt.scatter(blocks, error, edgecolor = 'k', color = 'green', zorder=10)
+	plt.xlabel('Block Size (ns)')
+	plt.ylabel(r'SEM')
+	plt.savefig(out+'block_average.png',dpi=300,bbox_inches='tight')
+
+	fig = plt.figure(figsize = (7,4))
+	plt.errorbar(blocks, block_mean, yerr=error, capsize = 2, color ='coral')
+	plt.scatter(blocks, block_mean, edgecolor = 'k', color ='coral', zorder=10)
+	plt.xlabel('Block Size')
+	plt.ylabel('Average <X>')
+	plt.savefig(out+'block_average_error.png',dpi=300,bbox_inches='tight')
+
+
+def make_block_average(data):
+	'''
+	Block averaging procedure for a time series
+	'''
+	sdata = len(data)
+	if sdata%2 == 1:
+		data = data[1:] 
+		sdata = sdata-1
+
+	minblocksize = 1
+	maxblocksize = int(sdata/4)
+
+	average = np.mean(data)
+	error = []
+	block_mean = []
+	blocks = []
+
+	for blocksize in range(minblocksize,maxblocksize+1,1):
+		s = []
+		if sdata%blocksize == 0:
+			nblocks = int(sdata/blocksize)
+			for i in range(nblocks):
+				s.append(np.mean(data[i*blocksize:(i+1)*blocksize]))
+			block_mean.append(np.mean(s))
+			summation = 0
+			for val in s:
+				summation += (val-average)**2
+			sigma_sq = summation/(nblocks-1) 
+			error.append(np.sqrt(sigma_sq/nblocks))
+			blocks.append(blocksize)
+
+	return(blocks,error,block_mean)
 
 def run():
 	if args.mode ==  0:
@@ -146,7 +205,11 @@ def run():
 	else:
 		raise ValueError('Mode does not exists')
 	np.savetxt(args.out+'.dat',series,fmt=['%10.2f','%4d'])
-	save_plot_total(series,args.out)
+
+	blocks,error,block_mean = make_block_average(series[:,1])
+	save_plot_block(blocks,error,block_mean,args.out)
+	sem = np.mean(error[-3:])
+	save_plot_total(series,args.out,sem)
 
 	matrix, possible_dic = init_matrix(args.input_map,args.cutoff,args.total_frames)
 	matrix, names = fill_matrix(args.input,matrix,possible_dic,args.fix_sele1,args.fix_sele2,args.mode)
