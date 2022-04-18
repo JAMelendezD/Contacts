@@ -25,6 +25,8 @@ python time_series.py hbonds.txt hbonds_count.dat 184 -816 26102 0.02 0.1 hbond_
 
 <p align="center">
   <img width="1000" src="images/hbond_series_mat.png">
+  <img width="1000" src="images/hbond_seriesblock_average.png">
+  <img width="1000" src="images/hbond_seriesblock_average_error.png">
   <img width="1000" src="images/hbond_series.png">
 </p>
 
