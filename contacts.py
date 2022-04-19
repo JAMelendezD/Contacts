@@ -80,8 +80,10 @@ def run():
 
 	u = mda.Universe(args.top,args.traj)
 	len_traj = len(u.trajectory[args.first:args.last+1])
-	
+	dt = (u.trajectory[1].time-u.trajectory[0].time)*1e-3
+
 	print(f'The number of frames are:\t\t\t{len_traj:8d}')
+	print(f'The calculated time step is:\t\t\t{dt:8.4f} ns')
 
 	sele1 = args.sele1
 	sele2 = args.sele2
