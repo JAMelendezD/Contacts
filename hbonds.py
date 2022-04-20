@@ -59,7 +59,7 @@ def distance(atom1, atom2):
 @jit(nopython=True)
 def contacts(positions1,positions2,cutoff):
 	'''
-	Computes all contacts defined by a cutoff for a given frame
+	Computes all contacts defined by a cutoff distance D-A for a given frame
 	'''
 	out = []
 	for i in range(len(positions1)):
@@ -70,6 +70,9 @@ def contacts(positions1,positions2,cutoff):
 	return out
 
 def angle(hbonds,donors,acceptors_pos,universe):
+	'''
+	Computes the angle H-D-A for all bonded H to the donors
+	'''
 	result = []
 	for ele in hbonds:
 		donor = donors[int(ele[0])]
