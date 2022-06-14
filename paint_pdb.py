@@ -7,7 +7,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('input', type=str, help='Input text file')
 parser.add_argument('fmap', type=str, help='Map with value and residue')
 parser.add_argument('chain', type=str, help='Chain identifier to match residues')
-parser.add_argument('out', type=str, help='Output file without extension')
+parser.add_argument("--xvg", default=False, action=argparse.BooleanOptionalAction)
 args = parser.parse_args()
 
 def splitm(line):
@@ -23,15 +23,20 @@ def create_dict(fname):
 	with open(fname,'r') as f:
 		for line in f:
 			data = line.split()
-			map[data[0][3:]] = float(data[1])*100
-	return(map)
+			if args.xvg:
+				if data[0] != '#' or data[0] != '@':
+					map[data[0]] = float(data[1])*100
+			else:
+				map[data[0][3:]] = float(data[1])*100
+	return map
 
-def run(inp,out,fmap,chain):
+def main(inp, fmap, chain):
 	print('Suggested spectrum')
 	print('spectrum b, 0xF4F3F3 0xD28288 0xF6A377 0xFBDF66 0xCFF66A 0x77FB74')
 	map = create_dict(fmap)
 	keys = map.keys() 
 	pdb_format = "{:6s}{:5d} {:^4s}{:1s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {:>2s}{:2s}\n"
+	out = inp.split('.')[0]+'_painted.pdb'
 	with open(inp,'r') as f:
 		with open(out, 'w') as fw:
 			for line in f:
@@ -63,4 +68,4 @@ def run(inp,out,fmap,chain):
 					fw.write(line)
 
 if __name__ == '__main__':
-	run(args.input,args.out,args.fmap,args.chain)
+	main(args.input, args.fmap, args.chain)
